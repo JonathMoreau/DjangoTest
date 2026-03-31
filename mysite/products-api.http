@@ -1,0 +1,97 @@
+@host = http://127.0.0.1:8000
+@json = application/json
+@categoryId = 1
+@productId = 1
+
+### OpenAPI spec
+GET {{host}}/api/openapi.yaml
+Accept: application/yaml
+
+### List categories
+GET {{host}}/api/categories/
+Accept: {{json}}
+
+### Create category
+POST {{host}}/api/categories/
+Content-Type: {{json}}
+Accept: {{json}}
+
+{
+  "name": "Gaming"
+}
+
+### Get category detail
+GET {{host}}/api/categories/{{categoryId}}/
+Accept: {{json}}
+
+### Update category
+PATCH {{host}}/api/categories/{{categoryId}}/
+Content-Type: {{json}}
+Accept: {{json}}
+
+{
+  "name": "Gaming Premium"
+}
+
+### Delete category
+DELETE {{host}}/api/categories/{{categoryId}}/
+Accept: {{json}}
+
+### List products
+GET {{host}}/api/products/
+Accept: {{json}}
+
+### List products by category
+GET {{host}}/api/products/?category_id={{categoryId}}
+Accept: {{json}}
+
+### List active products in stock
+GET {{host}}/api/products/?is_active=true&in_stock=true
+Accept: {{json}}
+
+### Search products
+GET {{host}}/api/products/?search=casque
+Accept: {{json}}
+
+### Create product
+POST {{host}}/api/products/
+Content-Type: {{json}}
+Accept: {{json}}
+
+{
+  "category_id": {{categoryId}},
+  "sku": "SKU-HTTP-001",
+  "name": "Casque HTTP",
+  "slug": "casque-http",
+  "description": "Produit cree depuis le fichier .http",
+  "price": "129.90",
+  "stock": 15,
+  "is_active": true
+}
+
+### Get product detail
+GET {{host}}/api/products/{{productId}}/
+Accept: {{json}}
+
+### Update product stock and status
+PATCH {{host}}/api/products/{{productId}}/
+Content-Type: {{json}}
+Accept: {{json}}
+
+{
+  "stock": 8,
+  "is_active": false
+}
+
+### Move product to another category
+PATCH {{host}}/api/products/{{productId}}/
+Content-Type: {{json}}
+Accept: {{json}}
+
+{
+  "category_id": {{categoryId}}
+}
+
+### Delete product
+DELETE {{host}}/api/products/{{productId}}/
+Accept: {{json}}

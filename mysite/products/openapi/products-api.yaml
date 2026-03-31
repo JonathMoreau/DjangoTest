@@ -1,0 +1,447 @@
+openapi: 3.0.3
+info:
+  title: Products and Categories API
+  version: "1.0.0"
+  description: >
+    Contrat OpenAPI pour la gestion des modeles Django Product et Category.
+    Cette specification sert de base avant et pendant l'implementation des endpoints.
+servers:
+  - url: /
+tags:
+  - name: Categories
+    description: Gestion CRUD des categories
+  - name: Products
+    description: Gestion CRUD des produits
+paths:
+  /api/openapi.yaml:
+    get:
+      summary: Recuperer la specification OpenAPI
+      operationId: getOpenApiSpec
+      responses:
+        "200":
+          description: Specification OpenAPI au format YAML
+          content:
+            application/yaml:
+              schema:
+                type: string
+  /api/categories/:
+    get:
+      tags: [Categories]
+      summary: Lister les categories
+      operationId: listCategories
+      responses:
+        "200":
+          description: Liste des categories
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryListResponse"
+    post:
+      tags: [Categories]
+      summary: Creer une categorie
+      operationId: createCategory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryWrite"
+            example:
+              name: Audio
+      responses:
+        "201":
+          description: Categorie creee
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+  /api/categories/{category_id}/:
+    parameters:
+      - $ref: "#/components/parameters/CategoryId"
+    get:
+      tags: [Categories]
+      summary: Recuperer une categorie
+      operationId: getCategory
+      responses:
+        "200":
+          description: Categorie detaillee
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Categories]
+      summary: Mettre a jour une categorie
+      operationId: updateCategory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryWrite"
+            example:
+              name: Audio premium
+      responses:
+        "200":
+          description: Categorie mise a jour
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Categories]
+      summary: Supprimer une categorie
+      operationId: deleteCategory
+      responses:
+        "204":
+          description: Categorie supprimee
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: La categorie est encore referencee par des produits
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/products/:
+    get:
+      tags: [Products]
+      summary: Lister les produits
+      operationId: listProducts
+      parameters:
+        - in: query
+          name: category_id
+          schema:
+            type: integer
+          description: Filtre par categorie
+        - in: query
+          name: is_active
+          schema:
+            type: boolean
+          description: Filtre par statut d'activation
+        - in: query
+          name: in_stock
+          schema:
+            type: boolean
+          description: Filtre selon le stock disponible
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Recherche sur le nom, le SKU ou le slug
+      responses:
+        "200":
+          description: Liste des produits
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+    post:
+      tags: [Products]
+      summary: Creer un produit
+      operationId: createProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductWrite"
+            example:
+              category_id: 1
+              sku: SKU-001
+              name: Casque Studio
+              slug: casque-studio
+              description: Un casque confortable pour le quotidien.
+              price: "149.90"
+              stock: 12
+              is_active: true
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ProductWriteMultipart"
+      responses:
+        "201":
+          description: Produit cree
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+  /api/products/{product_id}/:
+    parameters:
+      - $ref: "#/components/parameters/ProductId"
+    get:
+      tags: [Products]
+      summary: Recuperer un produit
+      operationId: getProduct
+      responses:
+        "200":
+          description: Produit detaille
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Products]
+      summary: Mettre a jour partiellement un produit
+      operationId: updateProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductPatch"
+            example:
+              stock: 8
+              is_active: true
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ProductPatchMultipart"
+      responses:
+        "200":
+          description: Produit mis a jour
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+    delete:
+      tags: [Products]
+      summary: Supprimer un produit
+      operationId: deleteProduct
+      responses:
+        "204":
+          description: Produit supprime
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  parameters:
+    CategoryId:
+      in: path
+      name: category_id
+      required: true
+      schema:
+        type: integer
+    ProductId:
+      in: path
+      name: product_id
+      required: true
+      schema:
+        type: integer
+  responses:
+    NotFound:
+      description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ValidationError:
+      description: Donnees invalides
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationError"
+    UnsupportedMediaType:
+      description: Type de contenu non supporte
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Category:
+      type: object
+      required: [id, name, product_count]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          maxLength: 100
+        product_count:
+          type: integer
+          minimum: 0
+    CategoryWrite:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          maxLength: 100
+    CategorySummary:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    Product:
+      type: object
+      required:
+        [id, category, sku, name, slug, description, image_url, price, stock, is_active, created_at, updated_at]
+      properties:
+        id:
+          type: integer
+        category:
+          $ref: "#/components/schemas/CategorySummary"
+        sku:
+          type: string
+          maxLength: 50
+        name:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+        description:
+          type: string
+        image_url:
+          type: string
+          nullable: true
+          format: uri
+        price:
+          type: string
+          example: "149.90"
+        stock:
+          type: integer
+          minimum: 0
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ProductWrite:
+      type: object
+      required: [category_id, sku, name, slug, price]
+      properties:
+        category_id:
+          type: integer
+        sku:
+          type: string
+          maxLength: 50
+        name:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+        description:
+          type: string
+          default: ""
+        price:
+          type: string
+          example: "149.90"
+        stock:
+          type: integer
+          minimum: 0
+          default: 0
+        is_active:
+          type: boolean
+          default: true
+    ProductWriteMultipart:
+      allOf:
+        - $ref: "#/components/schemas/ProductWrite"
+        - type: object
+          properties:
+            image:
+              type: string
+              format: binary
+    ProductPatch:
+      type: object
+      properties:
+        category_id:
+          type: integer
+        sku:
+          type: string
+          maxLength: 50
+        name:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+          example: "149.90"
+        stock:
+          type: integer
+          minimum: 0
+        is_active:
+          type: boolean
+        clear_image:
+          type: boolean
+          description: Permet de supprimer l'image courante
+    ProductPatchMultipart:
+      allOf:
+        - $ref: "#/components/schemas/ProductPatch"
+        - type: object
+          properties:
+            image:
+              type: string
+              format: binary
+    CategoryListResponse:
+      type: object
+      required: [count, items]
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+    ProductListResponse:
+      type: object
+      required: [count, items]
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+    Error:
+      type: object
+      required: [detail]
+      properties:
+        detail:
+          type: string
+    ValidationFieldError:
+      type: object
+      required: [message, code]
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+    ValidationError:
+      allOf:
+        - $ref: "#/components/schemas/Error"
+        - type: object
+          properties:
+            errors:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ValidationFieldError"

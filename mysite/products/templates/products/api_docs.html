@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Documentation API</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Segoe UI", sans-serif;
+            background: #f6f7fb;
+            color: #162033;
+        }
+
+        body {
+            margin: 0;
+            background:
+                radial-gradient(circle at top left, rgba(84, 125, 255, 0.14), transparent 30%),
+                linear-gradient(180deg, #f9fbff 0%, #eef2f9 100%);
+        }
+
+        .page-header {
+            padding: 2rem 1.5rem 1rem;
+        }
+
+        .page-header h1 {
+            margin: 0 0 0.5rem;
+            font-size: clamp(2rem, 4vw, 3rem);
+        }
+
+        .page-header p {
+            margin: 0;
+            max-width: 44rem;
+            line-height: 1.5;
+            color: #43506a;
+        }
+
+        .page-header a {
+            color: #0a58ca;
+            font-weight: 600;
+        }
+
+        .docs-shell {
+            margin: 0 1rem 1rem;
+            border: 1px solid rgba(22, 32, 51, 0.08);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(22, 32, 51, 0.08);
+            background: #ffffff;
+        }
+
+        redoc {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <h1>Documentation API</h1>
+        <p>
+            Cette page affiche la specification OpenAPI exposee par Django.
+            Vous pouvez aussi consulter directement le fichier YAML :
+            <a href="{% url 'products:api-openapi' %}">{% url 'products:api-openapi' %}</a>.
+        </p>
+    </header>
+
+    <main class="docs-shell">
+        <redoc spec-url="{% url 'products:api-openapi' %}"></redoc>
+    </main>
+
+    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+</body>
+</html>
