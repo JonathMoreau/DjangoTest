@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nova Market | Catalogue</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'products/catalog.css' %}">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="topbar">
+        <a class="brand" href="{% url 'products:catalog' %}">Nova Market</a>
+        <a class="topbar-link" href="{% url 'task_list' %}">Todo app</a>
+      </div>
+
+      <div class="hero__content">
+        <div class="hero__copy">
+          <p class="eyebrow">Catalogue premium</p>
+          <h1>Une vitrine ecommerce moderne pour vos produits Django.</h1>
+          <p class="hero__text">
+            Parcourez les categories, reperez les references disponibles et mettez
+            vos produits en avant avec une presentation claire, rapide et elegante.
+          </p>
+          <div class="hero__actions">
+            <a class="hero__button hero__button--primary" href="#produits">Voir les produits</a>
+            <a class="hero__button hero__button--secondary" href="#categories">Voir les categories</a>
+          </div>
+        </div>
+
+        <div class="hero__stats">
+          <article class="stat-card">
+            <span class="stat-card__label">Produits actifs</span>
+            <strong class="stat-card__value">{{ all_product_count }}</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-card__label">Categories</span>
+            <strong class="stat-card__value">{{ category_count }}</strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-card__label">Produits en stock</span>
+            <strong class="stat-card__value">{{ in_stock_count }}</strong>
+          </article>
+        </div>
+      </div>
+    </header>
+
+    <main class="content-stack">
+      <section class="filters-panel" id="categories">
+        <div>
+          <p class="section-label">Filtrer par categorie</p>
+          <div class="chip-row">
+            <a
+              class="chip {% if not selected_category %}is-active{% endif %}"
+              href="{% url 'products:catalog' %}"
+            >
+              Toutes
+              <span>{{ all_product_count }}</span>
+            </a>
+            {% for category in categories %}
+              <a
+                class="chip {% if selected_category_id == category.id %}is-active{% endif %}"
+                href="{% url 'products:catalog' %}?category={{ category.id }}"
+              >
+                {{ category.name }}
+                <span>{{ category.active_product_count }}</span>
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="filters-panel__summary">
+          <span class="section-label">Selection actuelle</span>
+          {% if selected_category %}
+            <p>{{ selected_category.name }} - {{ product_count }} produit{{ product_count|pluralize }}</p>
+          {% else %}
+            <p>Toutes les categories - {{ product_count }} produit{{ product_count|pluralize }}</p>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="category-showcase">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">Categories</p>
+            <h2>Des rayons imagines comme une boutique en ligne</h2>
+          </div>
+          <p class="section-copy">
+            Chaque categorie expose ses produits phares pour rendre le catalogue
+            lisible des la premiere visite.
+          </p>
+        </div>
+
+        <div class="category-grid">
+          {% for category in categories %}
+            <article class="category-card {% if selected_category_id == category.id %}is-selected{% endif %}">
+              <div class="category-card__header">
+                <p>{{ category.active_product_count }} produit{{ category.active_product_count|pluralize }}</p>
+                <a href="{% url 'products:catalog' %}?category={{ category.id }}">Voir</a>
+              </div>
+              <h3>{{ category.name }}</h3>
+              <ul class="category-card__list">
+                {% for preview_product in category.active_products|slice:":3" %}
+                  <li>{{ preview_product.name }}</li>
+                {% empty %}
+                  <li>Catalogue en cours de remplissage</li>
+                {% endfor %}
+              </ul>
+            </article>
+          {% empty %}
+            <article class="empty-state">
+              <h3>Aucune categorie active</h3>
+              <p>Ajoutez des produits actifs dans l'administration pour alimenter le catalogue.</p>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="products-section" id="produits">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">Produits</p>
+            <h2>
+              {% if selected_category %}
+                Selection {{ selected_category.name }}
+              {% else %}
+                Le catalogue complet
+              {% endif %}
+            </h2>
+          </div>
+          <p class="section-copy">
+            Les cartes mettent en avant le prix, le stock et la categorie pour une lecture immediate.
+          </p>
+        </div>
+
+        <div class="product-grid">
+          {% for product in products %}
+            <article class="product-card">
+              <div class="product-card__media">
+                {% if product.image %}
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                  <div class="product-card__placeholder">
+                    <span>{{ product.category.name }}</span>
+                    <strong>{{ product.name|slice:":1" }}</strong>
+                  </div>
+                {% endif %}
+
+                <span class="product-card__badge">{{ product.category.name }}</span>
+                <span class="inventory-badge {% if product.stock == 0 %}is-empty{% endif %}">
+                  {% if product.stock == 0 %}
+                    Rupture
+                  {% else %}
+                    En stock
+                  {% endif %}
+                </span>
+              </div>
+
+              <div class="product-card__body">
+                <div class="product-card__meta">
+                  <p class="product-card__sku">SKU {{ product.sku }}</p>
+                  <p class="product-card__price">{{ product.price }} EUR</p>
+                </div>
+                <h3>{{ product.name }}</h3>
+                <p class="product-card__description">
+                  {% if product.description %}
+                    {{ product.description|truncatechars:120 }}
+                  {% else %}
+                    Une presentation produit epuree pour enrichir votre storefront Django.
+                  {% endif %}
+                </p>
+
+                <div class="product-card__footer">
+                  <span>{{ product.stock }} unite{{ product.stock|pluralize }} disponible{{ product.stock|pluralize }}</span>
+                  <span class="product-card__cta">Catalogue online</span>
+                </div>
+              </div>
+            </article>
+          {% empty %}
+            <article class="empty-state empty-state--wide">
+              <h3>Aucun produit a afficher</h3>
+              <p>Ajoutez des produits actifs dans `products` pour remplir cette vitrine.</p>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

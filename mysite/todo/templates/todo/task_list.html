@@ -1,0 +1,21 @@
+<h1>Mes tâches</h1>
+
+<form method="post">
+  {% csrf_token %}
+  <input type="text" name="title" placeholder="Nouvelle tâche">
+  <button type="submit">Ajouter</button>
+</form>
+
+<ul>
+  {% for task in tasks %}
+    <li>
+      {% if task.is_done %}
+        <s>{{ task.title }}</s>
+      {% else %}
+        {{ task.title }}
+      {% endif %}
+      <a href="{% url 'toggle_task' task.id %}">Basculer</a>
+      <p>{{ task.created_at }}</p>
+    </li>
+  {% endfor %}
+</ul>
