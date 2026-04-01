@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creer un compte | Workspace</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Outfit", "Segoe UI", sans-serif;
+      color: #1b160f;
+      background: #f4eee6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background:
+        radial-gradient(circle at top left, rgba(78, 140, 118, 0.22), transparent 30%),
+        linear-gradient(180deg, #f8f5ef 0%, #f0ebe2 100%);
+    }
+
+    .card {
+      width: min(720px, 100%);
+      padding: 28px;
+      border-radius: 28px;
+      border: 1px solid rgba(27, 22, 15, 0.08);
+      background: rgba(255, 250, 245, 0.82);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 60px rgba(48, 31, 16, 0.1);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-family: "Fraunces", "Georgia", serif;
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      line-height: 1;
+    }
+
+    .lead {
+      margin: 0 0 22px;
+      color: #6a5f53;
+      line-height: 1.6;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    form .field--full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      min-height: 50px;
+      padding: 0 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(27, 22, 15, 0.12);
+      background: #fffdf9;
+      font: inherit;
+    }
+
+    .helptext,
+    .field-note {
+      display: block;
+      margin-top: 8px;
+      color: #6a5f53;
+      line-height: 1.5;
+    }
+
+    .errorlist {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: #a13f30;
+    }
+
+    .actions {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .button,
+    .ghost-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .button {
+      border: 0;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, #3d8a70, #63a389);
+      font: inherit;
+    }
+
+    .ghost-link {
+      color: #2c6452;
+      background: rgba(61, 138, 112, 0.12);
+    }
+
+    @media (max-width: 720px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Creer un compte front</h1>
+    <p class="lead">
+      Ce formulaire initialise une authentification par session pour les espaces utilisateur.
+      L'admin Django reste disponible pour la gestion back-office des comptes et permissions.
+    </p>
+
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="{% if field.name == 'username' or field.name == 'email' or field.name == 'password1' or field.name == 'password2' %}field--full{% endif %}">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <span class="field-note">{{ field.help_text }}</span>
+          {% endif %}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+
+      <div class="actions">
+        <button class="button" type="submit">Creer mon compte</button>
+        <a class="ghost-link" href="{% url 'accounts:login' %}">J'ai deja un compte</a>
+        <a class="ghost-link" href="{% url 'products:catalog' %}">Retour au catalogue</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

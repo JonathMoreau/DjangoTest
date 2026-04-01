@@ -90,14 +90,6 @@ class ProductsApiTests(TestCase):
         self.assertContains(response, "openapi: 3.0.3")
         self.assertContains(response, "/api/products/")
 
-    def test_api_docs_page_renders(self):
-        response = self.client.get(reverse("products:api-docs"))
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "products/api_docs.html")
-        self.assertContains(response, reverse("products:api-openapi"))
-        self.assertContains(response, "Documentation API")
-
     def test_categories_collection_returns_counts(self):
         response = self.client.get(reverse("products:api-categories"))
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Documentation API</title>
+    <title>{{ domain.title }} - API Docs</title>
     <style>
         :root {
             color-scheme: light;
@@ -23,8 +23,14 @@
             padding: 2rem 1.5rem 1rem;
         }
 
+        .page-header a {
+            color: #0a58ca;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
         .page-header h1 {
-            margin: 0 0 0.5rem;
+            margin: 0.5rem 0;
             font-size: clamp(2rem, 4vw, 3rem);
         }
 
@@ -35,9 +41,15 @@
             color: #43506a;
         }
 
-        .page-header a {
-            color: #0a58ca;
-            font-weight: 600;
+        .nav {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .nav a.active {
+            color: #162033;
         }
 
         .docs-shell {
@@ -56,16 +68,28 @@
 </head>
 <body>
     <header class="page-header">
-        <h1>Documentation API</h1>
+        <a href="{% url 'api_docs:index' %}">Retour a la liste des domaines</a>
+        <h1>{{ domain.title }}</h1>
         <p>
-            Cette page affiche la specification OpenAPI exposee par Django.
-            Vous pouvez aussi consulter directement le fichier YAML :
-            <a href="{% url 'products:api-openapi' %}">{% url 'products:api-openapi' %}</a>.
+            {{ domain.description }}
+            Specification brute :
+            <a href="{{ domain.spec_url }}">{{ domain.spec_url }}</a>.
         </p>
+
+        <nav class="nav" aria-label="Domaines documentes">
+            {% for item in domains %}
+                <a
+                    href="{{ item.docs_url }}"
+                    {% if item.slug == domain.slug %}class="active"{% endif %}
+                >
+                    {{ item.title }}
+                </a>
+            {% endfor %}
+        </nav>
     </header>
 
     <main class="docs-shell">
-        <redoc spec-url="{% url 'products:api-openapi' %}"></redoc>
+        <redoc spec-url="{{ domain.spec_url }}"></redoc>
     </main>
 
     <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>

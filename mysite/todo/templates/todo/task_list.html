@@ -1,21 +1,252 @@
-<h1>Mes tâches</h1>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Workspace | Mes taches</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Outfit", "Segoe UI", sans-serif;
+      background: #f4efe8;
+      color: #201810;
+    }
 
-<form method="post">
-  {% csrf_token %}
-  <input type="text" name="title" placeholder="Nouvelle tâche">
-  <button type="submit">Ajouter</button>
-</form>
+    * {
+      box-sizing: border-box;
+    }
 
-<ul>
-  {% for task in tasks %}
-    <li>
-      {% if task.is_done %}
-        <s>{{ task.title }}</s>
-      {% else %}
-        {{ task.title }}
-      {% endif %}
-      <a href="{% url 'toggle_task' task.id %}">Basculer</a>
-      <p>{{ task.created_at }}</p>
-    </li>
-  {% endfor %}
-</ul>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(214, 111, 74, 0.22), transparent 28%),
+        linear-gradient(180deg, #f9f5ef 0%, #f1ebe1 100%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .shell {
+      width: min(960px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 20px 0 32px;
+    }
+
+    .topbar,
+    .hero,
+    .composer,
+    .task-item {
+      border: 1px solid rgba(32, 24, 16, 0.08);
+      background: rgba(255, 250, 245, 0.78);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 18px 48px rgba(51, 31, 17, 0.08);
+      border-radius: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px;
+      margin-bottom: 18px;
+    }
+
+    .topbar__nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .pill,
+    .pill-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 0;
+      background: rgba(32, 24, 16, 0.06);
+      color: #6f6257;
+      font-weight: 700;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .pill--accent {
+      background: linear-gradient(135deg, #cf6c47, #de8a62);
+      color: #fff;
+    }
+
+    .hero {
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-family: "Fraunces", "Georgia", serif;
+      line-height: 1;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 54ch;
+      line-height: 1.6;
+      color: #6f6257;
+    }
+
+    .composer {
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .composer form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+    }
+
+    .composer input {
+      min-height: 52px;
+      border-radius: 18px;
+      border: 1px solid rgba(32, 24, 16, 0.12);
+      padding: 0 16px;
+      font: inherit;
+      background: #fffdf9;
+    }
+
+    .tasks {
+      display: grid;
+      gap: 14px;
+    }
+
+    .task-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 18px;
+    }
+
+    .task-item h2 {
+      margin: 0 0 6px;
+      font-size: 1.1rem;
+    }
+
+    .task-item p {
+      margin: 0;
+      color: #6f6257;
+    }
+
+    .task-item.is-done h2 {
+      text-decoration: line-through;
+      color: #8a8179;
+    }
+
+    .task-meta {
+      display: grid;
+      gap: 6px;
+    }
+
+    .task-actions form {
+      margin: 0;
+    }
+
+    .empty-state {
+      padding: 28px;
+      text-align: center;
+      border-radius: 24px;
+      border: 1px dashed rgba(32, 24, 16, 0.14);
+      color: #6f6257;
+      background: rgba(255, 250, 245, 0.5);
+    }
+
+    @media (max-width: 720px) {
+      .topbar,
+      .task-item {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .composer form {
+        grid-template-columns: 1fr;
+      }
+
+      .task-actions {
+        width: 100%;
+      }
+
+      .task-actions .pill-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <strong>Workspace</strong>
+      <nav class="topbar__nav" aria-label="Navigation">
+        <a class="pill" href="{% url 'products:catalog' %}">Catalogue</a>
+        <a class="pill" href="{% url 'api_docs:index' %}">API docs</a>
+        <a class="pill" href="{% url 'accounts:dashboard' %}">Mon compte</a>
+        <form method="post" action="{% url 'accounts:logout' %}">
+          {% csrf_token %}
+          <button class="pill-button" type="submit">Se deconnecter</button>
+        </form>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Mes taches</h1>
+      <p>
+        Bonjour {{ request.user.username }}. Cette liste est maintenant rattachee
+        a votre session utilisateur pour preparer un vrai espace de travail par compte.
+      </p>
+    </section>
+
+    <section class="composer">
+      <form method="post">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Ajouter une nouvelle tache">
+        <button class="pill-button pill--accent" type="submit">Ajouter</button>
+      </form>
+    </section>
+
+    <section class="tasks">
+      {% for task in tasks %}
+        <article class="task-item {% if task.is_done %}is-done{% endif %}">
+          <div class="task-meta">
+            <h2>{{ task.title }}</h2>
+            <p>Creee le {{ task.created_at|date:"d/m/Y H:i" }}</p>
+          </div>
+
+          <div class="task-actions">
+            <form method="post" action="{% url 'toggle_task' task.id %}">
+              {% csrf_token %}
+              <button class="pill-button" type="submit">
+                {% if task.is_done %}
+                  Marquer comme a faire
+                {% else %}
+                  Marquer comme terminee
+                {% endif %}
+              </button>
+            </form>
+          </div>
+        </article>
+      {% empty %}
+        <div class="empty-state">
+          Aucune tache pour le moment. Creez votre premiere tache pour initialiser votre espace.
+        </div>
+      {% endfor %}
+    </section>
+  </main>
+</body>
+</html>

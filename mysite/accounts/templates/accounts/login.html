@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connexion | Workspace</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Outfit", "Segoe UI", sans-serif;
+      color: #1b160f;
+      background: #f4eee6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background:
+        radial-gradient(circle at top right, rgba(215, 112, 76, 0.24), transparent 30%),
+        linear-gradient(180deg, #faf5ef 0%, #f3ede4 100%);
+    }
+
+    .shell {
+      width: min(1080px, 100%);
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 420px);
+      gap: 20px;
+    }
+
+    .panel,
+    .form-card {
+      border-radius: 28px;
+      border: 1px solid rgba(27, 22, 15, 0.08);
+      background: rgba(255, 250, 245, 0.8);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 60px rgba(48, 31, 16, 0.1);
+    }
+
+    .panel {
+      padding: 32px;
+    }
+
+    .panel h1,
+    .form-card h2 {
+      margin: 0 0 14px;
+      font-family: "Fraunces", "Georgia", serif;
+      line-height: 1;
+    }
+
+    .panel h1 {
+      font-size: clamp(2.8rem, 6vw, 4.6rem);
+      max-width: 10ch;
+    }
+
+    .panel p,
+    .form-help,
+    .field-note {
+      color: #6a5f53;
+      line-height: 1.6;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .feature {
+      padding: 16px 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.66);
+    }
+
+    .feature strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .form-card {
+      padding: 26px;
+    }
+
+    .form-card form {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .form-card label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .form-card input {
+      width: 100%;
+      min-height: 50px;
+      padding: 0 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(27, 22, 15, 0.12);
+      background: #fffdf9;
+      font: inherit;
+    }
+
+    .button,
+    .ghost-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .button {
+      border: 0;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, #cf6c47, #df8c65);
+      font: inherit;
+    }
+
+    .ghost-link {
+      color: #7a3827;
+      background: rgba(207, 108, 71, 0.12);
+    }
+
+    .errorlist,
+    .form-errors {
+      margin: 0;
+      padding-left: 18px;
+      color: #a13f30;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 860px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="panel">
+      <h1>Une connexion simple pour un front Django solide.</h1>
+      <p>
+        Cette premiere version pose une authentification par session pour le front.
+        Elle s'appuie sur le systeme natif Django, compatible avec l'admin, les
+        protections CSRF et les futurs domaines metier.
+      </p>
+
+      <div class="feature-list">
+        <article class="feature">
+          <strong>Session navigateur</strong>
+          <span>Parfait pour les ecrans utilisateur et le back-office interne.</span>
+        </article>
+        <article class="feature">
+          <strong>Controle d'acces</strong>
+          <span>Les vues peuvent maintenant etre protegees par utilisateur connecte.</span>
+        </article>
+        <article class="feature">
+          <strong>Base evolutive</strong>
+          <span>Le socle est pret pour brancher les domaines commandes, expeditions et facturation.</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="form-card">
+      <h2>Connexion</h2>
+      <p class="form-help">Entrez vos identifiants pour retrouver votre espace de travail.</p>
+
+      {% if form.non_field_errors %}
+        <ul class="form-errors">
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        {% if next %}
+          <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
+        {% for field in form %}
+          <div>
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+              <p class="field-note">{{ field.help_text }}</p>
+            {% endif %}
+            {{ field.errors }}
+          </div>
+        {% endfor %}
+
+        <button class="button" type="submit">Se connecter</button>
+      </form>
+
+      <div class="actions">
+        <a class="ghost-link" href="{% url 'accounts:register' %}">Creer un compte</a>
+        <a class="ghost-link" href="{% url 'products:catalog' %}">Retour au catalogue</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

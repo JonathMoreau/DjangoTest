@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>API Docs</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Segoe UI", sans-serif;
+            background: #f6f7fb;
+            color: #162033;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(84, 125, 255, 0.14), transparent 30%),
+                linear-gradient(180deg, #f9fbff 0%, #eef2f9 100%);
+        }
+
+        .shell {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1rem 3rem;
+        }
+
+        .hero h1 {
+            margin: 0 0 0.75rem;
+            font-size: clamp(2rem, 4vw, 3rem);
+        }
+
+        .hero p {
+            max-width: 48rem;
+            line-height: 1.6;
+            color: #43506a;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            padding: 1.5rem;
+            border-radius: 20px;
+            background: #ffffff;
+            border: 1px solid rgba(22, 32, 51, 0.08);
+            box-shadow: 0 20px 60px rgba(22, 32, 51, 0.08);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+        }
+
+        .card p {
+            min-height: 4.5rem;
+            color: #43506a;
+            line-height: 1.55;
+        }
+
+        .links {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .links a {
+            text-decoration: none;
+            font-weight: 600;
+            color: #0a58ca;
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <section class="hero">
+            <h1>API Docs</h1>
+            <p>
+                Cette application centralise la documentation OpenAPI de chaque domaine metier.
+                Chaque app Django peut exposer sa specification et l'enregistrer ici,
+                sans melanger la doc dans l'app fonctionnelle elle-meme.
+            </p>
+        </section>
+
+        <section class="grid">
+            {% for domain in domains %}
+                <article class="card">
+                    <h2>{{ domain.title }}</h2>
+                    <p>{{ domain.description }}</p>
+                    <div class="links">
+                        <a href="{{ domain.docs_url }}">Voir la doc</a>
+                        <a href="{{ domain.spec_url }}">OpenAPI YAML</a>
+                    </div>
+                </article>
+            {% empty %}
+                <article class="card">
+                    <h2>Aucune documentation</h2>
+                    <p>Aucun domaine n'a encore enregistre de specification OpenAPI.</p>
+                </article>
+            {% endfor %}
+        </section>
+    </main>
+</body>
+</html>

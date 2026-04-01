@@ -4,10 +4,6 @@ from django.shortcuts import render
 from .models import Category, Product
 
 
-def api_docs(request):
-    return render(request, "products/api_docs.html")
-
-
 def catalog(request):
     active_products = (
         Product.objects.filter(is_active=True)

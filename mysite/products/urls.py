@@ -7,8 +7,6 @@ app_name = "products"
 urlpatterns = [
     path("", views.catalog, name="catalog"),
     path("catalogue/", views.catalog, name="catalogue"),
-    path("api/docs", views.api_docs, name="api-docs"),
-    path("api/docs/", views.api_docs),
     path("api/openapi.yaml", api.openapi_spec, name="api-openapi"),
     path("api/categories/", api.categories_collection, name="api-categories"),
     path(
