@@ -46,6 +46,12 @@ def dashboard(request):
             "label": "Ouvrir todo",
         },
         {
+            "title": "Commandes",
+            "description": "Creer et consulter vos commandes depuis le front utilisateur.",
+            "url": reverse("orders:list"),
+            "label": "Ouvrir les commandes",
+        },
+        {
             "title": "API docs",
             "description": "Parcourir les specifications OpenAPI par domaine metier.",
             "url": reverse("api_docs:index"),

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Commandes | Workspace</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Outfit", "Segoe UI", sans-serif;
+      color: #1d1710;
+      background: #f4efe8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(214, 111, 74, 0.18), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(68, 128, 110, 0.16), transparent 24%),
+        linear-gradient(180deg, #faf6f0 0%, #f1ebe2 100%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(1120px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 20px 0 40px;
+    }
+
+    .topbar,
+    .hero,
+    .stat-card,
+    .order-card,
+    .empty-state {
+      border-radius: 28px;
+      border: 1px solid rgba(29, 23, 16, 0.08);
+      background: rgba(255, 250, 245, 0.8);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 60px rgba(48, 31, 16, 0.08);
+    }
+
+    .topbar,
+    .hero__header,
+    .order-card__header,
+    .order-card__footer,
+    .line-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .topbar {
+      padding: 16px 18px;
+      margin-bottom: 18px;
+    }
+
+    .topbar__nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .pill,
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 0;
+      font: inherit;
+      font-weight: 700;
+    }
+
+    .pill {
+      background: rgba(29, 23, 16, 0.06);
+      color: #6a5f53;
+    }
+
+    .pill--accent {
+      background: linear-gradient(135deg, #cb6c46, #de8f67);
+      color: #fff;
+    }
+
+    .hero {
+      padding: 28px;
+      margin-bottom: 18px;
+    }
+
+    .hero h1,
+    .order-card h2,
+    .empty-state h2 {
+      margin: 0;
+      font-family: "Fraunces", "Georgia", serif;
+      line-height: 1;
+    }
+
+    .hero h1 { font-size: clamp(2.6rem, 5vw, 4rem); }
+
+    .hero p,
+    .order-card p,
+    .line-item span,
+    .empty-state p {
+      color: #6a5f53;
+      line-height: 1.6;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .stat-card { padding: 18px; }
+
+    .stat-card strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 2rem;
+    }
+
+    .content {
+      display: grid;
+      gap: 16px;
+    }
+
+    .order-card { padding: 22px; }
+
+    .order-card__header h2 { font-size: 1.8rem; }
+
+    .status-chip {
+      background: rgba(68, 128, 110, 0.12);
+      color: #2f6c5b;
+    }
+
+    .order-card__lines {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(29, 23, 16, 0.08);
+    }
+
+    .line-item {
+      padding: 12px 0;
+      border-bottom: 1px dashed rgba(29, 23, 16, 0.08);
+    }
+
+    .line-item:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .order-card__footer { margin-top: 18px; }
+
+    .empty-state {
+      padding: 28px;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .topbar,
+      .hero__header,
+      .order-card__header,
+      .order-card__footer,
+      .line-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <strong>Workspace</strong>
+      <nav class="topbar__nav" aria-label="Navigation">
+        <a class="pill" href="{% url 'accounts:dashboard' %}">Mon compte</a>
+        <a class="pill" href="{% url 'products:catalog' %}">Catalogue</a>
+        <a class="pill" href="{% url 'api_docs:index' %}">API docs</a>
+        <a class="pill pill--accent" href="{% url 'orders:create' %}">Nouvelle commande</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero__header">
+        <div>
+          <h1>Mes commandes</h1>
+          <p>Un premier domaine metier complet, relie au compte utilisateur, a l'administration et a une API securisee pour les integrations.</p>
+        </div>
+        <a class="pill pill--accent" href="{% url 'orders:create' %}">Creer une commande</a>
+      </div>
+
+      <div class="stats">
+        <article class="stat-card">
+          <span>Total</span>
+          <strong>{{ orders|length }}</strong>
+        </article>
+        {% for card in status_cards %}
+          <article class="stat-card">
+            <span>{{ card.label }}</span>
+            <strong>{{ card.count }}</strong>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="content">
+      {% for order in orders %}
+        <article class="order-card">
+          <div class="order-card__header">
+            <div>
+              <h2>{{ order.number }}</h2>
+              <p>Creee le {{ order.created_at|date:"d/m/Y H:i" }}</p>
+            </div>
+            <span class="status-chip">{{ order.get_status_display }}</span>
+          </div>
+
+          {% if order.notes %}
+            <p>{{ order.notes }}</p>
+          {% endif %}
+
+          <div class="order-card__lines">
+            {% for line in order.lines.all %}
+              <div class="line-item">
+                <div>
+                  <strong>{{ line.product_name }}</strong>
+                  <span>SKU {{ line.sku_snapshot }}</span>
+                </div>
+                <span>{{ line.quantity }} x {{ line.unit_price }} EUR</span>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="order-card__footer">
+            <strong>Total {{ order.total_amount }} EUR</strong>
+            <a class="pill" href="{% url 'orders:detail' order.id %}">Voir le detail</a>
+          </div>
+        </article>
+      {% empty %}
+        <article class="empty-state">
+          <h2>Aucune commande</h2>
+          <p>Votre espace est pret. Creez votre premiere commande pour amorcer le domaine orders.</p>
+        </article>
+      {% endfor %}
+    </section>
+  </main>
+</body>
+</html>

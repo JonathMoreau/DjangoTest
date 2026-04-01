@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'accounts.apps.AccountsConfig',
+    'api_clients.apps.ApiClientsConfig',
     'api_docs.apps.ApiDocsConfig',
+    'orders.apps.OrdersConfig',
     'todo',
     'products',
 ]

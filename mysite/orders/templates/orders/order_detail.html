@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ order.number }} | Commande</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Outfit", "Segoe UI", sans-serif;
+      color: #1d1710;
+      background: #f4efe8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top right, rgba(68, 128, 110, 0.18), transparent 24%),
+        linear-gradient(180deg, #faf6f0 0%, #f1ebe2 100%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(980px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 20px 0 40px;
+    }
+
+    .topbar,
+    .card {
+      border-radius: 28px;
+      border: 1px solid rgba(29, 23, 16, 0.08);
+      background: rgba(255, 250, 245, 0.82);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 60px rgba(48, 31, 16, 0.08);
+    }
+
+    .topbar,
+    .meta,
+    .line-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .topbar {
+      padding: 16px 18px;
+      margin-bottom: 18px;
+    }
+
+    .card { padding: 28px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: rgba(29, 23, 16, 0.06);
+      color: #6a5f53;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-family: "Fraunces", "Georgia", serif;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      line-height: 1;
+    }
+
+    p, span {
+      color: #6a5f53;
+      line-height: 1.6;
+    }
+
+    .lines {
+      display: grid;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(29, 23, 16, 0.08);
+    }
+
+    .line-item {
+      padding: 14px 0;
+      border-bottom: 1px dashed rgba(29, 23, 16, 0.08);
+    }
+
+    .line-item:last-child {
+      border-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <strong>Workspace</strong>
+      <a class="pill" href="{% url 'orders:list' %}">Retour aux commandes</a>
+    </header>
+
+    <section class="card">
+      <h1>{{ order.number }}</h1>
+      <div class="meta">
+        <span>Statut : {{ order.get_status_display }}</span>
+        <strong>Total : {{ order.total_amount }} EUR</strong>
+      </div>
+      <p>Creee le {{ order.created_at|date:"d/m/Y H:i" }}</p>
+
+      {% if order.notes %}
+        <p>{{ order.notes }}</p>
+      {% endif %}
+
+      <section class="lines">
+        {% for line in order.lines.all %}
+          <div class="line-item">
+            <div>
+              <strong>{{ line.product_name }}</strong>
+              <span>SKU {{ line.sku_snapshot }}</span>
+            </div>
+            <span>{{ line.quantity }} x {{ line.unit_price }} EUR = {{ line.total_amount }} EUR</span>
+          </div>
+        {% endfor %}
+      </section>
+    </section>
+  </main>
+</body>
+</html>

@@ -75,10 +75,18 @@ Option cible :
 
 Option de depart si tu veux aller plus vite :
 
+- app `api_clients`
 - table `ApiClient`
 - secret stocke sous forme hachee
-- emission de tokens courts ou verification par cle API
+- jeton Bearer au format `<client_id>.<secret>`
 - scopes par client
+
+Implementation actuellement en place :
+
+- commande `orders` avec front, admin, API et spec OpenAPI
+- protection M2M sur l'API `orders` via scopes `orders:read` et `orders:write`
+- creation d'un client M2M via :
+  `py mysite/manage.py create_api_client "ERP" --scope orders:read --scope orders:write`
 
 Je recommande quand meme de viser rapidement un modele standard OAuth2 si l'API doit
 etre consommee par plusieurs systemes.

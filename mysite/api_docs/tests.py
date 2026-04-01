@@ -9,7 +9,9 @@ class ApiDocsViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "api_docs/index.html")
         self.assertContains(response, "Catalogue produits")
+        self.assertContains(response, "Commandes")
         self.assertContains(response, reverse("api_docs:domain-docs", args=["products"]))
+        self.assertContains(response, reverse("api_docs:domain-docs", args=["orders"]))
 
     def test_domain_docs_page_uses_registered_openapi_spec(self):
         response = self.client.get(reverse("api_docs:domain-docs", args=["products"]))
@@ -18,3 +20,11 @@ class ApiDocsViewTests(TestCase):
         self.assertTemplateUsed(response, "api_docs/domain_detail.html")
         self.assertContains(response, reverse("products:api-openapi"))
         self.assertContains(response, "Catalogue produits")
+
+    def test_orders_domain_docs_page_uses_registered_openapi_spec(self):
+        response = self.client.get(reverse("api_docs:domain-docs", args=["orders"]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "api_docs/domain_detail.html")
+        self.assertContains(response, reverse("orders:api-openapi"))
+        self.assertContains(response, "Commandes")
